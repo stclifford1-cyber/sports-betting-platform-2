@@ -11,3 +11,4 @@ data/interim/
 
 # macOS
 .DS_Store
+venv/
