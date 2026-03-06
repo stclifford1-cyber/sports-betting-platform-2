@@ -20,8 +20,23 @@ def init_db():
         CREATE TABLE IF NOT EXISTS slates (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             source TEXT NOT NULL,
-            created_at TEXT NOT NULL,
-            payload TEXT NOT NULL
+            created_at TEXT NOT NULL
+        )
+        """
+    )
+
+    connection.execute(
+        """
+        CREATE TABLE IF NOT EXISTS matches (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            slate_id INTEGER NOT NULL,
+            player_1 TEXT NOT NULL,
+            player_2 TEXT NOT NULL,
+            tournament TEXT NOT NULL,
+            start_time TEXT NOT NULL,
+            odds_player_1 REAL NOT NULL,
+            odds_player_2 REAL NOT NULL,
+            FOREIGN KEY (slate_id) REFERENCES slates(id)
         )
         """
     )
