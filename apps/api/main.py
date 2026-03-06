@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List
 
 
@@ -7,17 +7,18 @@ app = FastAPI(title="Sports Betting Strategy Development Platform")
 
 
 class MatchEntry(BaseModel):
-    player_1: str
-    player_2: str
-    tournament: str
+    player_1: str = Field(min_length=1)
+    player_2: str = Field(min_length=1)
+    tournament: str = Field(min_length=1)
     start_time: str
-    odds_player_1: float
-    odds_player_2: float
+
+    odds_player_1: float = Field(gt=0)
+    odds_player_2: float = Field(gt=0)
 
 
 class DailySlate(BaseModel):
-    source: str
-    matches: List[MatchEntry]
+    source: str = Field(min_length=1)
+    matches: List[MatchEntry] = Field(min_length=1)
 
 
 app_state = {
@@ -35,15 +36,16 @@ def info():
     return {
         "project": "Sports Betting Strategy Development Platform",
         "focus": "tennis",
-        "stage": "initial ingestion API"
+        "stage": "validated ingestion API"
     }
 
 
 @app.post("/slate")
 def create_slate(slate: DailySlate):
     app_state["latest_slate"] = slate.model_dump()
+
     return {
-        "message": "Daily slate received",
+        "message": "Daily slate accepted",
         "match_count": len(slate.matches),
         "source": slate.source
     }
