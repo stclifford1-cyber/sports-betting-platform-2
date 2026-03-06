@@ -12,6 +12,28 @@ def get_connection():
     return connection
 
 
+def ensure_match_result_columns(connection):
+    cursor = connection.cursor()
+
+    cursor.execute("PRAGMA table_info(matches)")
+    existing_columns = {row[1] for row in cursor.fetchall()}
+
+    if "status" not in existing_columns:
+        cursor.execute(
+            "ALTER TABLE matches ADD COLUMN status TEXT NOT NULL DEFAULT 'pending'"
+        )
+
+    if "winner" not in existing_columns:
+        cursor.execute(
+            "ALTER TABLE matches ADD COLUMN winner TEXT"
+        )
+
+    if "completed_at" not in existing_columns:
+        cursor.execute(
+            "ALTER TABLE matches ADD COLUMN completed_at TEXT"
+        )
+
+
 def init_db():
     connection = get_connection()
 
@@ -40,6 +62,25 @@ def init_db():
         )
         """
     )
+
+    connection.execute(
+        """
+        CREATE TABLE IF NOT EXISTS bets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            match_id INTEGER NOT NULL,
+            selection TEXT NOT NULL,
+            odds REAL NOT NULL,
+            stake REAL NOT NULL,
+            status TEXT NOT NULL DEFAULT 'open',
+            profit_loss REAL,
+            placed_at TEXT NOT NULL,
+            settled_at TEXT,
+            FOREIGN KEY (match_id) REFERENCES matches(id)
+        )
+        """
+    )
+
+    ensure_match_result_columns(connection)
 
     connection.commit()
     connection.close()
