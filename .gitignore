@@ -12,3 +12,9 @@ data/interim/
 # macOS
 .DS_Store
 venv/
+
+# Local runtime database
+data/processed/app.db
+
+# Local runtime database
+data/processed/app.db
